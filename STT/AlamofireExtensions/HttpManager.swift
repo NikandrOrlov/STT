@@ -94,7 +94,7 @@ public class HttpManager: HttpManagerType {
     public func upload(
         _ method: HTTPMethod,
         controller: ApiControllerType,
-        object: UploadObject?,
+        object: [UploadObject]?,
         parameters: [String: String],
         headers: HTTPHeaders?,
         isAuthorized: Bool,
@@ -121,12 +121,14 @@ public class HttpManager: HttpManagerType {
                 })
                 
                 if let object = object {
-                    multipart .append(
-                        object.data,
-                        withName: object.name,
-                        fileName: object.fileName,
-                        mimeType: object.mimeType
-                    )
+                    object.forEach({ object in
+                        multipart .append(
+                            object.data,
+                            withName: object.name,
+                            fileName: object.fileName,
+                            mimeType: object.mimeType
+                        )
+                    })
                 }
             }, to: controller,
                method: method,
