@@ -42,7 +42,7 @@ public protocol HttpManagerType {
     func upload(
         _ method: HTTPMethod,
         controller: ApiControllerType,
-        object: UploadObject?,
+        object: [UploadObject]?,
         parameters: [String: String],
         headers: HTTPHeaders?,
         isAuthorized: Bool,
