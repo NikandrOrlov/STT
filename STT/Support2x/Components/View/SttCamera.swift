@@ -27,13 +27,18 @@
 import Foundation
 import UIKit
 import AVFoundation
+import RxSwift
 
 open class SttCamera: NSObject, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
+    
+    private let disposeBag = DisposeBag()
     
     private let applicationName: String
     public let picker = UIImagePickerController()
     public let callBack: (UIImage) -> Void
     public weak var parent: UIViewController?
+    
+    public var isCompleted = Dynamic(false)
     
     public init (parent: UIViewController, applicationName: String, handler: @escaping (UIImage) -> Void) {
         self.callBack = handler
@@ -55,7 +60,6 @@ open class SttCamera: NSObject, UIImagePickerControllerDelegate, UINavigationCon
     
     open func showPopuForDecision() {
         if checkPermission() {
-            
             parent?.present(createPopupDecision(), animated: true, completion: nil)
         }
         else {
@@ -79,6 +83,13 @@ open class SttCamera: NSObject, UIImagePickerControllerDelegate, UINavigationCon
         }
         
         return actionController
+    }
+    
+    open func onCompletedAction(_ action: @escaping () -> Void) {
+        isCompleted.addListener({
+            guard $0 == true else { return }
+            action()
+        }).disposed(by: disposeBag)
     }
     
     private func checkPermission() -> Bool {
@@ -122,5 +133,6 @@ open class SttCamera: NSObject, UIImagePickerControllerDelegate, UINavigationCon
             callBack(_image)
         }
         picker.dismiss(animated: true, completion: nil)
+        isCompleted.value = true
     }
 }
